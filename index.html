@@ -213,6 +213,19 @@
   .result { margin-top: 24px; display:none; }
   .result.show { display:block; animation: fade .5s ease; }
   @keyframes fade { from{opacity:0; transform: translateY(8px);} to{opacity:1; transform:none;} }
+  .result-head {
+    border-top: 2px solid var(--amber);
+    background: rgba(200,119,47,.07);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .result-head h3 {
+    font-family: 'Inter', sans-serif; font-weight: 700;
+    color: #e9b277; font-size: clamp(19px, 4vw, 22px); line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .result-head p { margin-top: 8px; font-size: 14px; color: rgba(250,247,241,.72); line-height: 1.5; }
   .result .ba { box-shadow: 0 20px 50px rgba(0,0,0,.4); border-color: rgba(250,247,241,.14); }
   .result .rcap { margin-top: 14px; font-size: 13px; color: rgba(250,247,241,.6); text-align:center; }
   .disclaimer { margin-top: 18px; font-size: 12.5px; color: rgba(250,247,241,.55); text-align:center; line-height:1.5; background: rgba(255,255,255,.04); border:1px solid rgba(250,247,241,.12); border-radius: 12px; padding: 12px 16px; }
@@ -455,6 +468,10 @@
       </div>
 
       <div class="result" id="result">
+        <div class="result-head" id="resultHead">
+          <h3>&#10024; Here&rsquo;s the result</h3>
+          <p>A sample of the magazine-quality photo RoomCast produces &mdash; your room would be transformed the same way.</p>
+        </div>
         <div class="ba" id="ba2" tabindex="0" role="slider" aria-label="Sample result before and after slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
           <img class="before-pane" src="assets/living-before.webp" alt="Sample raw phone snapshot of a living room" />
           <img class="after-pane" src="assets/living-after.webp" alt="Sample RoomCast listing photo of the living room" />
@@ -577,7 +594,12 @@
   var procBar = document.getElementById('procBar');
   var procStat = document.getElementById('procStat');
   var result = document.getElementById('result');
+  var resultHead = document.getElementById('resultHead');
   var ba2Inited = false;
+  var processingStarted = false;
+  var finished = false;
+  var procInterval = null;
+  var safetyTimer = null;
 
   ['dragenter', 'dragover'].forEach(function (ev) {
     drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('hot'); });
@@ -591,6 +613,10 @@
   input.addEventListener('change', function () { if (input.files[0]) handleFile(input.files[0]); });
 
   function resetUI() {
+    if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
+    if (procInterval) { clearInterval(procInterval); procInterval = null; }
+    processingStarted = false;
+    finished = false;
     frameRow.innerHTML = '';
     framesBox.classList.remove('show');
     proc.classList.remove('show');
@@ -600,17 +626,27 @@
 
   function handleFile(file) {
     resetUI();
-    if (file.type.indexOf('video/') === 0) extractVideoFrames(file);
-    else if (file.type.indexOf('image/') === 0) showImageAsFrames(file);
+    if (file.type.indexOf('video/') === 0) {
+      // Hard safety net: even if frame extraction stalls completely, kick off processing by ~4.5s.
+      safetyTimer = setTimeout(function () { startProcessing(); }, 4500);
+      extractVideoFrames(file);
+    }
+    else if (file.type.indexOf('image/') === 0) {
+      safetyTimer = setTimeout(function () { startProcessing(); }, 4500);
+      showImageAsFrames(file);
+    }
     else { framesTitle.textContent = "That file type isn't supported — try a room video or photo."; framesBox.classList.add('show'); }
   }
 
   function startProcessing() {
+    if (processingStarted) return;
+    processingStarted = true;
+    if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
     proc.classList.add('show');
     var p = 0;
-    var t = setInterval(function () {
+    procInterval = setInterval(function () {
       p += Math.random() * 16 + 6;
-      if (p >= 100) { p = 100; clearInterval(t); finish(); }
+      if (p >= 100) { p = 100; clearInterval(procInterval); procInterval = null; finish(); }
       procBar.style.width = p + '%';
       if (p > 66) procStat.innerHTML = '<span class="pulse"></span> Balancing light &amp; color…';
       else if (p > 33) procStat.innerHTML = '<span class="pulse"></span> Removing clutter &amp; straightening lines…';
@@ -618,9 +654,17 @@
   }
 
   function finish() {
+    if (finished) return;
+    finished = true;
+    if (procInterval) { clearInterval(procInterval); procInterval = null; }
+    procBar.style.width = '100%';
     result.classList.add('show');
     if (!ba2Inited) { initBA(document.getElementById('ba2')); ba2Inited = true; }
-    result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Wait for layout to settle (better mobile reliability), then scroll the heading to the top of view.
+    setTimeout(function () {
+      var target = resultHead || result;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 
   function addPlaceholders(n) {
