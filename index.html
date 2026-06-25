@@ -1,128 +1,634 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Name — Tagline</title>
-  <meta name="description" content="Your project description for SEO.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            surface: { 1: '#09090b', 2: '#0f0f12', 3: '#16161a', 4: '#1e1e24' },
-            coral: { DEFAULT: '#e8735e', light: '#f09a8a', dark: '#c45a47' },
-            amber: { DEFAULT: '#d4a23a', light: '#e4be6a' },
-            zinc: { 50: '#fafafa', 100: '#f4f4f5', 200: '#e4e4e7', 300: '#d4d4d8', 400: '#a1a1aa', 500: '#71717a', 600: '#52525b', 700: '#3f3f46', 800: '#27272a', 900: '#18181b' }
-          },
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace']
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>RoomCast — Turn a phone walkthrough into listing-ready photos</title>
+<meta name="description" content="Point your phone around a room and get professional listing photos plus an interactive 3D view, automatically. A Brightbase prototype." />
+<meta property="og:title" content="RoomCast — listing-ready photos from a phone walkthrough" />
+<meta property="og:description" content="Raw phone shot in, magazine-quality listing photo out. Plus interactive 3D. A Brightbase prototype." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #16130f;
+    --ink-soft: #3a342c;
+    --paper: #faf7f1;
+    --paper-2: #f2ece1;
+    --line: rgba(22, 19, 15, 0.10);
+    --line-strong: rgba(22, 19, 15, 0.16);
+    --amber: #c8772f;
+    --amber-deep: #a85e1f;
+    --muted: #8b8377;
+    --card: #ffffff;
+    --shadow: 0 1px 2px rgba(22,19,15,.04), 0 12px 32px rgba(22,19,15,.06);
+    --radius: 18px;
+    --maxw: 1120px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 500; line-height: 1.08; letter-spacing: -0.01em; margin: 0; }
+  p { margin: 0; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; }
+  .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--amber-deep);
+  }
+  .eyebrow::before { content: ""; width: 18px; height: 1.5px; background: var(--amber); display: inline-block; border-radius: 2px; }
+
+  /* ---------- NAV ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(140%) blur(12px);
+    background: rgba(250,247,241,0.78);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-family: 'Fraunces', serif; font-weight: 600; font-size: 19px; letter-spacing: -0.02em; }
+  .brand .dot { width: 22px; height: 22px; border-radius: 7px; background: linear-gradient(135deg, var(--amber), var(--amber-deep)); position: relative; flex: 0 0 auto; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+  .brand .dot::after { content:""; position:absolute; inset: 6px; border: 1.6px solid rgba(255,255,255,.9); border-radius: 3px; }
+  .nav .cta { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; padding: 9px 16px; border-radius: 999px; background: var(--ink); color: var(--paper); text-decoration: none; transition: transform .15s ease, background .2s ease; }
+  .nav .cta:hover { transform: translateY(-1px); background: #000; }
+
+  /* ---------- HERO ---------- */
+  .hero { position: relative; padding: 64px 0 40px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; }
+  .hero h1 { font-size: clamp(40px, 7vw, 66px); }
+  .hero h1 .accent { font-style: italic; color: var(--amber-deep); }
+  .hero .sub { margin-top: 22px; font-size: clamp(16px, 2.4vw, 19px); color: var(--ink-soft); max-width: 30ch; }
+  .hero-actions { margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+    padding: 14px 24px; border-radius: 999px; text-decoration: none; cursor: pointer;
+    border: 1px solid transparent; transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+    display: inline-flex; align-items: center; gap: 9px;
+  }
+  .btn-primary { background: var(--ink); color: var(--paper); box-shadow: 0 8px 22px rgba(22,19,15,.16); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(22,19,15,.22); }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+  .btn-ghost:hover { background: var(--paper-2); }
+  .hero-note { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+  .hero-note .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 0 rgba(200,119,47,.5); animation: pulse 2.2s infinite; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(200,119,47,.5);} 70%{box-shadow:0 0 0 8px rgba(200,119,47,0);} 100%{box-shadow:0 0 0 0 rgba(200,119,47,0);} }
+
+  /* hero phone mock */
+  .phone {
+    position: relative; width: 100%; max-width: 320px; margin-left: auto;
+    aspect-ratio: 9 / 18; border-radius: 38px; padding: 10px;
+    background: linear-gradient(150deg, #211c16, #0e0c09);
+    box-shadow: 0 30px 60px rgba(22,19,15,.28), inset 0 0 0 1.5px rgba(255,255,255,.06);
+  }
+  .phone .screen { position: relative; width: 100%; height: 100%; border-radius: 30px; overflow: hidden; background: #000; }
+  .phone .screen img { width: 100%; height: 100%; object-fit: cover; }
+  .phone .notch { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 96px; height: 22px; background: #0e0c09; border-radius: 0 0 14px 14px; z-index: 3; }
+  .phone .badge {
+    position: absolute; left: 14px; bottom: 16px; z-index: 4;
+    background: rgba(250,247,241,.94); backdrop-filter: blur(6px);
+    border-radius: 12px; padding: 9px 13px; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 9px;
+  }
+  .phone .badge .ok { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg,var(--amber),var(--amber-deep)); display:grid; place-items:center; color:#fff; font-size: 12px; }
+  .phone .badge b { font-size: 12.5px; font-weight: 700; }
+  .phone .badge span { display:block; font-size: 11px; color: var(--muted); }
+
+  /* ---------- STRIP ---------- */
+  .strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--paper-2); }
+  .strip-inner { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; padding: 18px 0; }
+  .strip .item { display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: var(--ink-soft); font-weight: 500; }
+  .strip .item svg { color: var(--amber-deep); flex: 0 0 auto; }
+
+  /* ---------- SECTIONS ---------- */
+  section { padding: 84px 0; }
+  .section-head { max-width: 640px; margin: 0 auto 44px; text-align: center; }
+  .section-head h2 { font-size: clamp(28px, 4.6vw, 42px); margin-top: 16px; }
+  .section-head p { margin-top: 16px; color: var(--ink-soft); font-size: 17px; }
+
+  /* problem */
+  #problem { background: var(--ink); color: var(--paper); }
+  #problem .eyebrow { color: #e9b277; }
+  #problem .eyebrow::before { background: #e9b277; }
+  #problem .section-head p { color: rgba(250,247,241,.72); }
+  .shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 760px; margin: 0 auto; }
+  .shot { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 3/2; box-shadow: 0 20px 40px rgba(0,0,0,.35); }
+  .shot img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.92); }
+  .shot figcaption {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 12px;
+    background: linear-gradient(transparent, rgba(0,0,0,.78));
+    color: #fff; font-size: 13px; font-weight: 500; letter-spacing: .01em;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .shot .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #f0c79a; }
+  .problem-foot { text-align: center; margin: 36px auto 0; max-width: 560px; color: rgba(250,247,241,.62); font-size: 14.5px; }
+
+  /* before/after slider */
+  #compare { background: var(--paper); }
+  .ba-wrap { max-width: 880px; margin: 0 auto; }
+  .ba {
+    position: relative; width: 100%; aspect-ratio: 3/2; border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow); border: 1px solid var(--line); touch-action: pan-y; user-select: none; cursor: ew-resize;
+    background: #ddd;
+  }
+  .ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  .ba .after-pane { clip-path: inset(0 0 0 50%); will-change: clip-path; }
+  .ba .lbl {
+    position: absolute; top: 14px; z-index: 5; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: 6px 11px; border-radius: 999px; backdrop-filter: blur(6px); pointer-events: none;
+  }
+  .ba .lbl-before { left: 14px; background: rgba(22,19,15,.62); color: #fff; }
+  .ba .lbl-after { right: 14px; background: rgba(200,119,47,.92); color: #fff; }
+  .ba .handle {
+    position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: rgba(255,255,255,.92);
+    transform: translateX(-50%); z-index: 6; box-shadow: 0 0 0 1px rgba(22,19,15,.18);
+  }
+  .ba .knob {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 7;
+    width: 44px; height: 44px; border-radius: 50%; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.28);
+    display: grid; place-items: center; cursor: ew-resize;
+  }
+  .ba .knob svg { color: var(--ink); }
+  .ba:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+  .ba-cap { text-align: center; margin-top: 18px; color: var(--muted); font-size: 14px; }
+  .ba-cap b { color: var(--ink-soft); font-weight: 600; }
+
+  /* 3d */
+  #threed { background: var(--paper-2); }
+  .mv-wrap { max-width: 720px; margin: 0 auto; }
+  .mv-frame { position: relative; border-radius: var(--radius); overflow: hidden; background: linear-gradient(160deg,#fdfcfa,#ece4d6); box-shadow: var(--shadow); border: 1px solid var(--line); }
+  model-viewer { width: 100%; height: 460px; --poster-color: transparent; background: transparent; }
+  .mv-frame .hint { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 4;
+    background: rgba(255,255,255,.9); backdrop-filter: blur(6px); padding: 7px 14px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 600; color: var(--ink-soft); box-shadow: 0 2px 8px rgba(0,0,0,.08); display:flex; align-items:center; gap:7px; pointer-events:none; }
+  .mv-frame .hint svg { color: var(--amber-deep); }
+  .mv-poster { width:100%; height:460px; object-fit: contain; background: linear-gradient(160deg,#fdfcfa,#ece4d6); }
+
+  /* how it works */
+  #how { background: var(--paper); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; max-width: 980px; margin: 0 auto; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; box-shadow: var(--shadow); position: relative; }
+  .step .num { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600; color: #fff; width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,var(--amber),var(--amber-deep)); display: grid; place-items: center; margin-bottom: 18px; }
+  .step h3 { font-size: 20px; }
+  .step p { margin-top: 9px; color: var(--ink-soft); font-size: 14.5px; }
+  .step .glyph { position:absolute; top:24px; right:22px; color: var(--line-strong); }
+
+  /* try it */
+  #try { background: var(--ink); color: var(--paper); }
+  #try .eyebrow { color: #e9b277; } #try .eyebrow::before { background:#e9b277; }
+  #try .section-head p { color: rgba(250,247,241,.72); }
+  .try-card { max-width: 620px; margin: 0 auto; }
+  .drop {
+    border: 2px dashed rgba(250,247,241,.30); border-radius: var(--radius); padding: 42px 26px; text-align: center;
+    background: rgba(255,255,255,.03); transition: border-color .2s ease, background .2s ease; cursor: pointer; display: block;
+  }
+  .drop.hot { border-color: var(--amber); background: rgba(200,119,47,.08); }
+  .drop .ic { width: 56px; height: 56px; border-radius: 16px; background: rgba(250,247,241,.07); display:grid; place-items:center; margin: 0 auto 16px; color:#e9b277; }
+  .drop h3 { font-family:'Inter',sans-serif; font-weight:700; font-size:17px; }
+  .drop p { margin-top: 7px; font-size: 13.5px; color: rgba(250,247,241,.6); }
+  .drop .pick { margin-top: 16px; display:inline-block; font-size: 13px; font-weight:600; color:#e9b277; text-decoration: underline; text-underline-offset: 3px; }
+  .frames { margin-top: 22px; display: none; }
+  .frames.show { display: block; }
+  .frames h4 { font-family:'Inter',sans-serif; font-size: 12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color: rgba(250,247,241,.6); margin-bottom: 12px; }
+  .frame-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+  .frame-row img, .frame-row .ph { width:100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; background: rgba(255,255,255,.06); }
+  .proc { margin-top: 22px; display:none; }
+  .proc.show { display:block; }
+  .proc .bar { height: 6px; border-radius: 999px; background: rgba(250,247,241,.12); overflow:hidden; }
+  .proc .bar i { display:block; height:100%; width:0; background: linear-gradient(90deg,var(--amber),#e9b277); border-radius:999px; transition: width .3s linear; }
+  .proc .stat { margin-top: 10px; font-size: 13px; color: rgba(250,247,241,.7); display:flex; align-items:center; gap:8px; }
+  .proc .stat .pulse { width:8px; height:8px; border-radius:50%; background:#e9b277; }
+  .result { margin-top: 24px; display:none; }
+  .result.show { display:block; animation: fade .5s ease; }
+  @keyframes fade { from{opacity:0; transform: translateY(8px);} to{opacity:1; transform:none;} }
+  .result .ba { box-shadow: 0 20px 50px rgba(0,0,0,.4); border-color: rgba(250,247,241,.14); }
+  .result .rcap { margin-top: 14px; font-size: 13px; color: rgba(250,247,241,.6); text-align:center; }
+  .disclaimer { margin-top: 18px; font-size: 12.5px; color: rgba(250,247,241,.55); text-align:center; line-height:1.5; background: rgba(255,255,255,.04); border:1px solid rgba(250,247,241,.12); border-radius: 12px; padding: 12px 16px; }
+
+  /* footer */
+  footer { background: var(--paper); border-top: 1px solid var(--line); padding: 56px 0 40px; text-align: center; }
+  footer .brand { justify-content: center; font-size: 22px; }
+  footer p { margin-top: 16px; color: var(--ink-soft); font-size: 14.5px; max-width: 460px; margin-left:auto; margin-right:auto; }
+  footer .by { margin-top: 22px; font-size: 12.5px; color: var(--muted); letter-spacing: .02em; }
+  footer .by a { color: var(--amber-deep); text-decoration: none; font-weight: 600; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 880px) {
+    .hero { padding: 40px 0 28px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+    .hero .sub { max-width: none; }
+    .phone { max-width: 260px; margin: 0 auto; }
+    .steps { grid-template-columns: 1fr; max-width: 440px; }
+  }
+  @media (max-width: 540px) {
+    .wrap { padding: 0 18px; }
+    .strip-inner { gap: 18px 26px; padding: 16px 0; }
+    .shots { grid-template-columns: 1fr; gap: 14px; }
+    model-viewer, .mv-poster { height: 380px; }
+    .frame-row { grid-template-columns: repeat(2,1fr); }
+    .drop { padding: 34px 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; scroll-behavior: auto !important; transition: none !important; } }
+</style>
 </head>
-<body class="bg-surface-1 text-zinc-200 antialiased">
+<body>
 
-  <!-- ═══ DARK HERO ═══ -->
-  <header class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-b from-surface-1 via-surface-2 to-surface-3"></div>
-    <nav class="relative z-10 max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-      <a href="/" class="text-lg font-bold tracking-tight text-white">ProjectName</a>
-      <div class="flex items-center gap-8">
-        <a href="#features" class="text-sm text-zinc-400 hover:text-white transition-colors">Features</a>
-        <a href="#about" class="text-sm text-zinc-400 hover:text-white transition-colors">About</a>
-        <a href="#cta" class="text-sm font-medium text-surface-1 bg-coral px-4 py-2 rounded-lg hover:bg-coral-light transition-colors">Get Started</a>
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand"><span class="dot"></span>RoomCast</div>
+    <a href="#compare" class="cta" onclick="scrollTo2(event,'compare')">See the demo</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Listing photos, automatically</span>
+      <h1>Turn a phone walkthrough into <span class="accent">listing&#8209;ready</span> photos.</h1>
+      <p class="sub">Point your phone around a room. RoomCast cleans, declutters and relights every frame — then hands you magazine-quality photos and an interactive 3D view.</p>
+      <div class="hero-actions">
+        <a href="#compare" class="btn btn-primary" onclick="scrollTo2(event,'compare')">See before &amp; after
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#try" class="btn btn-ghost" onclick="scrollTo2(event,'try')">Try the prototype</a>
       </div>
-    </nav>
-    <div class="relative z-10 max-w-4xl mx-auto px-6 pt-24 pb-32 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-coral/10 border border-coral/20 rounded-full text-xs font-medium text-coral font-mono mb-8">
-        <span class="w-1.5 h-1.5 bg-coral rounded-full"></span>
-        STATUS OR TAGLINE
-      </div>
-      <h1 class="text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6">
-        Your headline goes here<span class="text-coral">.</span>
-      </h1>
-      <p class="text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10">
-        A clear, concise description of what this project does and why someone should care. Keep it to two sentences max.
-      </p>
-      <div class="flex items-center justify-center gap-4">
-        <a href="#cta" class="bg-coral text-surface-1 font-semibold px-6 py-3 rounded-lg hover:bg-coral-light transition-colors">Primary Action</a>
-        <a href="#features" class="border border-surface-4 text-zinc-300 font-medium px-6 py-3 rounded-lg hover:bg-surface-3 transition-colors">Learn More</a>
+      <div class="hero-note"><span class="pulse"></span> A Brightbase prototype — early exploration</div>
+    </div>
+    <div>
+      <div class="phone" aria-hidden="true">
+        <div class="notch"></div>
+        <div class="screen">
+          <img src="assets/living-after.webp" alt="A living room transformed into a bright, professional listing photo by RoomCast" width="320" height="640" />
+        </div>
+        <div class="badge">
+          <span class="ok">✓</span>
+          <div><b>Listing photo ready</b><span>Relit &amp; decluttered</span></div>
+        </div>
       </div>
     </div>
-  </header>
+  </div>
+</section>
 
-  <!-- ═══ LIGHT BODY ═══ -->
-  <main class="bg-zinc-50 text-zinc-900">
+<!-- TRUST STRIP -->
+<div class="strip">
+  <div class="wrap strip-inner">
+    <div class="item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.4 6.9H22l-5.8 4.3 2.2 7L12 16l-6.4 4.2 2.2-7L2 8.9h7.6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Magazine-quality results</div>
+    <div class="item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Declutter &amp; relight</div>
+    <div class="item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M3.3 7L12 12l8.7-5M12 12v9.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg> Interactive 3D objects</div>
+    <div class="item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h7l-1 8 10-12h-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Minutes, not a photoshoot</div>
+  </div>
+</div>
 
-    <!-- Features -->
-    <section id="features" class="max-w-6xl mx-auto px-6 py-24">
-      <div class="text-center mb-16">
-        <p class="text-sm font-semibold text-coral uppercase tracking-wider mb-3">Features</p>
-        <h2 class="text-3xl font-bold tracking-tight">What makes this different</h2>
-      </div>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-white border border-zinc-200 rounded-xl p-8">
-          <div class="w-10 h-10 bg-coral/10 rounded-lg flex items-center justify-center mb-4">
-            <span class="text-coral font-bold">01</span>
-          </div>
-          <h3 class="text-lg font-semibold mb-2">Feature One</h3>
-          <p class="text-zinc-500 leading-relaxed">Describe the feature and its benefit to the user. Keep it brief and benefit-focused.</p>
-        </div>
-        <div class="bg-white border border-zinc-200 rounded-xl p-8">
-          <div class="w-10 h-10 bg-coral/10 rounded-lg flex items-center justify-center mb-4">
-            <span class="text-coral font-bold">02</span>
-          </div>
-          <h3 class="text-lg font-semibold mb-2">Feature Two</h3>
-          <p class="text-zinc-500 leading-relaxed">Describe the feature and its benefit to the user. Keep it brief and benefit-focused.</p>
-        </div>
-        <div class="bg-white border border-zinc-200 rounded-xl p-8">
-          <div class="w-10 h-10 bg-coral/10 rounded-lg flex items-center justify-center mb-4">
-            <span class="text-coral font-bold">03</span>
-          </div>
-          <h3 class="text-lg font-semibold mb-2">Feature Three</h3>
-          <p class="text-zinc-500 leading-relaxed">Describe the feature and its benefit to the user. Keep it brief and benefit-focused.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- About -->
-    <section id="about" class="border-t border-zinc-200">
-      <div class="max-w-4xl mx-auto px-6 py-24 text-center">
-        <h2 class="text-3xl font-bold tracking-tight mb-6">About this project</h2>
-        <p class="text-lg text-zinc-500 leading-relaxed max-w-2xl mx-auto">
-          A longer description of the project, its background, and context. This section can be multiple paragraphs if needed.
-        </p>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section id="cta" class="border-t border-zinc-200 bg-white">
-      <div class="max-w-4xl mx-auto px-6 py-24 text-center">
-        <h2 class="text-3xl font-bold tracking-tight mb-4">Ready to get started?</h2>
-        <p class="text-zinc-500 mb-8">Call to action supporting text.</p>
-        <a href="mailto:hello@brightbase.co" class="inline-block bg-surface-1 text-white font-semibold px-8 py-3.5 rounded-lg hover:bg-zinc-800 transition-colors">Get in Touch</a>
-      </div>
-    </section>
-  </main>
-
-  <!-- ═══ DARK FOOTER ═══ -->
-  <footer class="bg-surface-1 border-t border-surface-4">
-    <div class="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
-      <p class="text-sm text-zinc-600">&copy; 2026 ProjectName. All rights reserved.</p>
-      <p class="text-xs text-zinc-700 font-mono">built on bbase.dev</p>
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The problem</span>
+      <h2>Most homes are shot on a phone, in a hurry, in bad light.</h2>
+      <p>Dim rooms, clutter, crooked angles — the photos that decide whether someone books or scrolls past. This is what real listings start with.</p>
     </div>
-  </footer>
+    <div class="shots">
+      <figure class="shot">
+        <img src="assets/bedroom-before.webp" alt="A dim, cluttered bedroom shot on a phone with an unmade bed" loading="lazy" width="600" height="400" />
+        <figcaption><span class="tag">Bedroom</span> Shot in a hurry, bad light</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/kitchen-before.webp" alt="A dim kitchen with dishes in the sink shot under harsh yellow light" loading="lazy" width="600" height="400" />
+        <figcaption><span class="tag">Kitchen</span> Harsh light, dishes, clutter</figcaption>
+      </figure>
+    </div>
+    <p class="problem-foot">Scroll on — watch one of these rooms become a listing photo, no photographer required.</p>
+  </div>
+</section>
 
+<!-- BEFORE / AFTER -->
+<section id="compare">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The transformation</span>
+      <h2>Drag to see the difference.</h2>
+      <p>The same living room — left, the raw phone snapshot; right, the RoomCast listing photo. Same furniture, decluttered and relit.</p>
+    </div>
+    <div class="ba-wrap">
+      <div class="ba" id="ba1" tabindex="0" role="slider" aria-label="Before and after comparison slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+        <img class="before-pane" src="assets/living-before.webp" alt="Living room as a raw, dark phone snapshot with cables and clutter" />
+        <img class="after-pane" src="assets/living-after.webp" alt="The same living room as a bright, clean, professional RoomCast listing photo" />
+        <span class="lbl lbl-before">Phone snapshot</span>
+        <span class="lbl lbl-after">RoomCast</span>
+        <div class="handle"></div>
+        <div class="knob" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <p class="ba-cap">Drag the handle &mdash; or use <b>← →</b> arrow keys when focused. Living room shown; bedroom &amp; kitchen are next in the pipeline.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3D -->
+<section id="threed">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Interactive 3D</span>
+      <h2>Lift any piece of furniture into 3D.</h2>
+      <p>RoomCast pulls objects out of the room and rebuilds them as real, rotatable 3D models. Drag to spin it. Pinch or scroll to zoom.</p>
+    </div>
+    <div class="mv-wrap">
+      <div class="mv-frame" id="mvFrame">
+        <img class="mv-poster" id="mvPoster" src="assets/chair-source.webp" alt="A tan upholstered mid-century lounge chair with a walnut frame, the source for the 3D model" />
+        <div class="hint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7M3 5v3.5h3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Drag to rotate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps, no photographer.</h2>
+      <p>From the phone in your pocket to a full set of listing-ready assets.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <svg class="glyph" width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="3" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>
+        <h3>Walk the room</h3>
+        <p>Hold up your phone and slowly pan around. A 20-second walkthrough captures every wall, corner and surface.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <svg class="glyph" width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="3.5" stroke="currentColor" stroke-width="1.6"/></svg>
+        <h3>AI does the work</h3>
+        <p>RoomCast cleans, declutters and relights every frame — straightening lines and balancing light like a pro photographer would.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <svg class="glyph" width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M8 11l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <h3>Download &amp; list</h3>
+        <p>Get a full set of listing photos plus interactive 3D views of the standout pieces — ready to publish in minutes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRY IT -->
+<section id="try">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Try it</span>
+      <h2>Drop in a walkthrough.</h2>
+      <p>Add a short room video and watch RoomCast pull out the frames. We'll then show you the kind of result you get.</p>
+    </div>
+    <div class="try-card">
+      <label class="drop" id="drop" for="fileInput">
+        <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M8 8l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Drop a room video or photo</h3>
+        <p>MP4, MOV or an image &mdash; everything runs in your browser, nothing is uploaded.</p>
+        <span class="pick">Choose a file</span>
+        <input id="fileInput" type="file" accept="video/*,image/*" hidden />
+      </label>
+
+      <div class="frames" id="frames">
+        <h4 id="framesTitle">Your walkthrough frames</h4>
+        <div class="frame-row" id="frameRow"></div>
+      </div>
+
+      <div class="proc" id="proc">
+        <div class="bar"><i id="procBar"></i></div>
+        <div class="stat" id="procStat"><span class="pulse"></span> Cleaning, decluttering &amp; relighting…</div>
+      </div>
+
+      <div class="result" id="result">
+        <div class="ba" id="ba2" tabindex="0" role="slider" aria-label="Sample result before and after slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+          <img class="before-pane" src="assets/living-before.webp" alt="Sample raw phone snapshot of a living room" />
+          <img class="after-pane" src="assets/living-after.webp" alt="Sample RoomCast listing photo of the living room" />
+          <span class="lbl lbl-before">Phone snapshot</span>
+          <span class="lbl lbl-after">RoomCast</span>
+          <div class="handle"></div>
+          <div class="knob" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <p class="rcap">The kind of result you get &mdash; sample shown on our living-room capture.</p>
+      </div>
+
+      <p class="disclaimer">Prototype &mdash; we extract real frames from your video in your browser, but the AI transformation here is shown on a sample capture. Live processing of your own room is the next build step.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>RoomCast</div>
+    <p>Listing-ready photos and interactive 3D, from the phone already in your pocket.</p>
+    <div class="by">A <a href="https://bbase.ai" target="_blank" rel="noopener">Brightbase</a> prototype &mdash; an early exploration, not a finished product.</div>
+  </div>
+</footer>
+
+<script>
+  // smooth scroll helper (avoid bare hash anchors in embedded contexts)
+  function scrollTo2(e, id) {
+    e.preventDefault();
+    var el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- Before/After slider (mouse + touch + keyboard) ----------
+  function initBA(root) {
+    if (!root) return;
+    var after = root.querySelector('.after-pane');
+    var handle = root.querySelector('.handle');
+    var knob = root.querySelector('.knob');
+    var pos = 50;
+    function set(p) {
+      pos = Math.max(0, Math.min(100, p));
+      after.style.clipPath = 'inset(0 0 0 ' + pos + '%)';
+      handle.style.left = pos + '%';
+      knob.style.left = pos + '%';
+      root.setAttribute('aria-valuenow', Math.round(pos));
+    }
+    function fromEvent(clientX) {
+      var r = root.getBoundingClientRect();
+      set(((clientX - r.left) / r.width) * 100);
+    }
+    var dragging = false;
+    function down(x) { dragging = true; fromEvent(x); }
+    function move(x) { if (dragging) fromEvent(x); }
+    function up() { dragging = false; }
+
+    root.addEventListener('mousedown', function (e) { down(e.clientX); });
+    window.addEventListener('mousemove', function (e) { move(e.clientX); });
+    window.addEventListener('mouseup', up);
+    root.addEventListener('touchstart', function (e) { down(e.touches[0].clientX); }, { passive: true });
+    root.addEventListener('touchmove', function (e) { if (dragging) fromEvent(e.touches[0].clientX); }, { passive: true });
+    root.addEventListener('touchend', up);
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { set(pos - 4); e.preventDefault(); }
+      if (e.key === 'ArrowRight') { set(pos + 4); e.preventDefault(); }
+      if (e.key === 'Home') { set(0); e.preventDefault(); }
+      if (e.key === 'End') { set(100); e.preventDefault(); }
+    });
+    set(50);
+  }
+  initBA(document.getElementById('ba1'));
+
+  // ---------- 3D model-viewer: lazy-load script on scroll into view ----------
+  var mvLoaded = false;
+  function loadModelViewer() {
+    if (mvLoaded) return; mvLoaded = true;
+    var s = document.createElement('script');
+    s.type = 'module';
+    s.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
+    document.head.appendChild(s);
+    var frame = document.getElementById('mvFrame');
+    var poster = document.getElementById('mvPoster');
+    var mv = document.createElement('model-viewer');
+    mv.setAttribute('src', 'assets/chair.glb');
+    mv.setAttribute('alt', 'Interactive 3D model of a tan mid-century lounge chair with a walnut frame');
+    mv.setAttribute('poster', 'assets/chair-source.webp');
+    mv.setAttribute('camera-controls', '');
+    mv.setAttribute('auto-rotate', '');
+    mv.setAttribute('auto-rotate-delay', '600');
+    mv.setAttribute('rotation-per-second', '24deg');
+    mv.setAttribute('interaction-prompt', 'auto');
+    mv.setAttribute('shadow-intensity', '0.9');
+    mv.setAttribute('exposure', '1.0');
+    mv.setAttribute('touch-action', 'pan-y');
+    mv.setAttribute('loading', 'eager');
+    mv.style.width = '100%';
+    mv.style.height = (poster && poster.offsetHeight) ? (poster.offsetHeight + 'px') : '460px';
+    frame.insertBefore(mv, frame.firstChild);
+    if (poster) poster.style.display = 'none';
+  }
+  var threeSection = document.getElementById('threed');
+  if ('IntersectionObserver' in window && threeSection) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { loadModelViewer(); io.disconnect(); } });
+    }, { rootMargin: '300px' });
+    io.observe(threeSection);
+  } else {
+    window.addEventListener('load', loadModelViewer);
+  }
+
+  // ---------- Try-it: real client-side frame extraction ----------
+  var drop = document.getElementById('drop');
+  var input = document.getElementById('fileInput');
+  var framesBox = document.getElementById('frames');
+  var frameRow = document.getElementById('frameRow');
+  var framesTitle = document.getElementById('framesTitle');
+  var proc = document.getElementById('proc');
+  var procBar = document.getElementById('procBar');
+  var procStat = document.getElementById('procStat');
+  var result = document.getElementById('result');
+  var ba2Inited = false;
+
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('hot'); });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('hot'); });
+  });
+  drop.addEventListener('drop', function (e) {
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  input.addEventListener('change', function () { if (input.files[0]) handleFile(input.files[0]); });
+
+  function resetUI() {
+    frameRow.innerHTML = '';
+    framesBox.classList.remove('show');
+    proc.classList.remove('show');
+    result.classList.remove('show');
+    procBar.style.width = '0';
+  }
+
+  function handleFile(file) {
+    resetUI();
+    if (file.type.indexOf('video/') === 0) extractVideoFrames(file);
+    else if (file.type.indexOf('image/') === 0) showImageAsFrames(file);
+    else { framesTitle.textContent = "That file type isn't supported — try a room video or photo."; framesBox.classList.add('show'); }
+  }
+
+  function startProcessing() {
+    proc.classList.add('show');
+    var p = 0;
+    var t = setInterval(function () {
+      p += Math.random() * 16 + 6;
+      if (p >= 100) { p = 100; clearInterval(t); finish(); }
+      procBar.style.width = p + '%';
+      if (p > 66) procStat.innerHTML = '<span class="pulse"></span> Balancing light &amp; color…';
+      else if (p > 33) procStat.innerHTML = '<span class="pulse"></span> Removing clutter &amp; straightening lines…';
+    }, 360);
+  }
+
+  function finish() {
+    result.classList.add('show');
+    if (!ba2Inited) { initBA(document.getElementById('ba2')); ba2Inited = true; }
+    result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function addPlaceholders(n) {
+    for (var i = 0; i < n; i++) { var d = document.createElement('div'); d.className = 'ph'; frameRow.appendChild(d); }
+  }
+
+  function showImageAsFrames(file) {
+    framesTitle.textContent = 'Your capture';
+    var url = URL.createObjectURL(file);
+    var img = document.createElement('img');
+    img.src = url; img.alt = 'Your uploaded room photo';
+    frameRow.appendChild(img);
+    framesBox.classList.add('show');
+    startProcessing();
+  }
+
+  function extractVideoFrames(file) {
+    framesTitle.textContent = 'Your walkthrough frames';
+    framesBox.classList.add('show');
+    addPlaceholders(4);
+    var video = document.createElement('video');
+    video.preload = 'metadata'; video.muted = true; video.playsInline = true;
+    video.src = URL.createObjectURL(file);
+    var canvas = document.createElement('canvas');
+    var grabbed = 0, targets = [], idx = 0;
+
+    video.addEventListener('loadedmetadata', function () {
+      var dur = video.duration && isFinite(video.duration) ? video.duration : 4;
+      targets = [0.1, 0.35, 0.6, 0.85].map(function (f) { return Math.min(dur * f, Math.max(0, dur - 0.05)); });
+      canvas.width = 160; canvas.height = 160;
+      seekNext();
+    });
+    function seekNext() { if (idx < targets.length) try { video.currentTime = targets[idx]; } catch (e) { startProcessing(); } }
+    video.addEventListener('seeked', function () {
+      try {
+        var ctx = canvas.getContext('2d');
+        var vw = video.videoWidth, vh = video.videoHeight, s = Math.min(vw, vh);
+        ctx.drawImage(video, (vw - s) / 2, (vh - s) / 2, s, s, 0, 0, 160, 160);
+        var data = canvas.toDataURL('image/jpeg', 0.8);
+        var slot = frameRow.children[grabbed];
+        var im = document.createElement('img'); im.src = data; im.alt = 'Extracted walkthrough frame';
+        if (slot) frameRow.replaceChild(im, slot); else frameRow.appendChild(im);
+      } catch (err) { /* keep placeholder */ }
+      grabbed++; idx++;
+      if (idx < targets.length) seekNext();
+      else startProcessing();
+    });
+    video.addEventListener('error', function () {
+      framesTitle.textContent = 'Frames extracted from your walkthrough';
+      startProcessing();
+    });
+  }
+</script>
 </body>
 </html>
