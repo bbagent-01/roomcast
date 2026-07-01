@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>RoomCast — your real room, done right</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#16130f;--ink-soft:#3a342c;--paper:#faf7f1;--paper-2:#f3ede2;
+    --line:rgba(22,19,15,.10);--line-strong:rgba(22,19,15,.16);
+    --amber:#c8772f;--amber-deep:#a85e1f;--teal:#2f8f86;--teal-deep:#236b64;
+    --muted:#8b8377;--card:#fff;--good:#2f8f5b;
+    --shadow:0 1px 2px rgba(22,19,15,.04),0 12px 32px rgba(22,19,15,.06);
+    --radius:16px;--maxw:880px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  h1,h2{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.08;letter-spacing:-.01em;margin:0}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+  header.top{border-bottom:1px solid var(--line);background:rgba(250,247,241,.82);backdrop-filter:blur(8px);position:sticky;top:0;z-index:30}
+  header.top .wrap{display:flex;align-items:center;gap:9px;height:58px}
+  .brand{display:flex;align-items:center;gap:9px;font-family:'Fraunces',serif;font-weight:600;font-size:18px;letter-spacing:-.02em}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,var(--amber),var(--amber-deep));flex:0 0 auto}
+  .hero{padding:42px 0 6px}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-deep);margin-bottom:14px}
+  .eyebrow::before{content:"";width:18px;height:1.5px;background:var(--amber);display:inline-block;border-radius:2px}
+  .hero h1{font-size:clamp(28px,5vw,42px)}
+  .hero h1 .accent{font-style:italic;color:var(--amber-deep)}
+  .hero .sub{margin-top:15px;font-size:clamp(15px,2.2vw,17px);color:var(--ink-soft);max-width:62ch}
+
+  /* enhancement explainer cards */
+  .enh{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:28px 0 4px}
+  .ecard{border:1.5px solid var(--line-strong);background:var(--card);border-radius:14px;padding:15px 15px 14px;position:relative}
+  .ecard .ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;margin-bottom:9px;color:#fff}
+  .ecard .ico svg{width:17px;height:17px}
+  .ecard h3{font-family:'Inter';font-size:14.5px;font-weight:700;margin:0 0 3px}
+  .ecard p{font-size:12.8px;color:var(--muted);line-height:1.42}
+  .ecard .st{display:inline-block;margin-top:9px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+  .st.live{background:#e9f6ee;color:var(--good)}
+  .st.soon{background:#f3ede2;color:var(--muted)}
+  .ic-light{background:linear-gradient(135deg,#e0a93f,#c8772f)}
+  .ic-tidy{background:linear-gradient(135deg,#4fb191,#236b64)}
+  .ic-angle{background:linear-gradient(135deg,#6b8fd0,#3a5a9a)}
+  .note{margin-top:14px;font-size:13px;color:var(--ink-soft);background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:11px 14px}
+  .note b{color:var(--ink);font-weight:600}
+
+  .body{padding:26px 0 50px}
+  .secttl{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-deep);margin:30px 0 4px}
+  .room{margin-top:22px}
+  .room-name{font-family:'Fraunces',serif;font-size:21px;font-weight:600;margin-bottom:11px;display:flex;align-items:baseline;gap:10px}
+  .room-name small{font-family:'Inter';font-size:12.5px;font-weight:500;color:var(--muted);letter-spacing:0;text-transform:none}
+
+  .ba{position:relative;width:100%;aspect-ratio:4/3;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);user-select:none;touch-action:pan-y;background:#e9e4da}
+  .ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+  .ba .after{clip-path:inset(0 0 0 50%);}
+  .ba .lbl{position:absolute;top:13px;z-index:6;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 11px;border-radius:999px;color:#fff;backdrop-filter:blur(6px)}
+  .ba .lbl-b{left:13px;background:rgba(60,66,74,.82)}
+  .ba .div{position:absolute;top:0;bottom:0;width:3px;background:#fff;z-index:7;transform:translateX(-50%);box-shadow:0 0 0 1px rgba(22,19,15,.16)}
+  .ba .knob{position:absolute;top:50%;width:44px;height:44px;border-radius:50%;transform:translate(-50%,-50%);z-index:8;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.3);display:grid;place-items:center;cursor:ew-resize;touch-action:none}
+  .ba .knob svg{width:18px;height:18px;color:var(--ink)}
+  /* AI-enhanced badge (transparency + AB723 disclosure) */
+  .badge{position:absolute;right:13px;top:13px;z-index:9;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.03em;padding:6px 11px 6px 9px;border-radius:999px;color:#fff;background:rgba(168,94,31,.94);border:none;cursor:pointer;backdrop-filter:blur(6px);box-shadow:0 2px 8px rgba(0,0,0,.18);transition:.12s}
+  .badge:hover{background:var(--amber-deep);transform:translateY(-1px)}
+  .badge svg{width:13px;height:13px}
+  .badge .pulse{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:pls 2.2s infinite}
+  @keyframes pls{0%{box-shadow:0 0 0 0 rgba(255,255,255,.6)}70%{box-shadow:0 0 0 6px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+  .hint{margin-top:9px;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .hint svg{width:14px;height:14px;color:var(--amber-deep)}
+
+  /* per-room enhancement chips (product shape) */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:999px;border:1.5px solid var(--line-strong);background:var(--card);color:var(--ink-soft);font-family:inherit}
+  .chip.tog{cursor:pointer;transition:.12s}.chip.tog:hover{border-color:var(--amber)}
+  .chip.soon{opacity:.5;cursor:default}
+  .chip.on{border-color:var(--amber);background:#fff7ef;color:var(--amber-deep)}
+  .chip.off{opacity:.5}
+  .chip .tk{width:14px;height:14px;border-radius:50%;display:grid;place-items:center;font-size:9px;color:#fff;background:var(--amber)}
+  .chip.off .tk{background:var(--muted);visibility:hidden}
+  .chip small{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+
+  /* original-photo overlay */
+  .ov{position:fixed;inset:0;z-index:100;background:rgba(22,19,15,.78);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:24px}
+  .ov.show{display:flex}
+  .ov-card{max-width:760px;width:100%;background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+  .ov-card .imw{position:relative;aspect-ratio:4/3;background:#e9e4da}
+  .ov-card img{width:100%;height:100%;object-fit:cover;display:block}
+  .ov-card .cap{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .ov-card .cap b{font-size:14px}
+  .ov-card .cap span{font-size:12.5px;color:var(--muted)}
+  .ov-x{border:none;background:var(--paper-2);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .ov-tag{position:absolute;left:13px;top:13px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 11px;border-radius:999px;color:#fff;background:rgba(60,66,74,.82)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 40px;margin-top:30px}
+  footer .wrap{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:9px}
+  footer .dot{width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg,var(--amber),var(--amber-deep))}
+  @media(max-width:640px){.enh{grid-template-columns:1fr}}
+
+  /* Tidy — drag-to-select demo */
+  .trycard{margin:8px 0 6px;border:1.5px solid var(--line-strong);background:var(--card);border-radius:16px;padding:18px 18px 16px;box-shadow:var(--shadow)}
+  .trycard .th{display:flex;align-items:center;gap:10px}
+  .trycard .th .ico{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#4fb191,#236b64);display:grid;place-items:center;color:#fff;flex:0 0 auto}
+  .trycard .th .ico svg{width:17px;height:17px}
+  .trycard h2{font-size:clamp(18px,3vw,21px)}
+  .trycard .pill-new{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,#4fb191,#236b64);padding:3px 8px;border-radius:999px}
+  .trycard .tsub{font-size:13.5px;color:var(--ink-soft);margin:9px 0 13px;max-width:66ch}
+  .tstage{position:relative;width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#e9e4da;touch-action:none;cursor:crosshair}
+  .tstage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+  .tstage canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3}
+  .tbadge{position:absolute;left:12px;top:12px;z-index:4;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 11px;border-radius:999px;color:#fff;background:rgba(35,107,100,.92);backdrop-filter:blur(6px);pointer-events:none;transition:opacity .2s}
+  .trow{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+  .tbtn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;border:1.5px solid var(--line-strong);background:var(--card);color:var(--ink);cursor:pointer;transition:.12s}
+  .tbtn:hover{border-color:var(--teal)}
+  .tbtn svg{width:14px;height:14px}
+  .tstat{font-size:12.8px;color:var(--muted)}
+  .tstat b{color:var(--teal-deep)}
+  .tnote{margin-top:11px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .tnote svg{width:14px;height:14px;color:var(--teal-deep);flex:0 0 auto}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><span class="brand"><span class="dot"></span> RoomCast</span></div></header>
+
+<section class="hero"><div class="wrap">
+  <div class="eyebrow">Private preview</div>
+  <h1>Your <span class="accent">real</span> room — like a pro shot it.</h1>
+  <p class="sub">RoomCast makes your phone photos look like a professional staged photoshoot of your <b>actual</b> place. It never invents or fakes anything — every output keeps an <b>AI&nbsp;Enhanced</b> badge that opens the untouched original.</p>
+
+  <div class="enh">
+    <div class="ecard">
+      <div class="ico ic-light"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v2M5.6 5.6l1.4 1.4M3 12h2M19 12h2M17 7l1.4-1.4M9 18h6M10 21h4M8.5 14a4.5 4.5 0 1 1 7 0c-.7.9-1.5 1.4-1.5 2.5h-4c0-1.1-.8-1.6-1.5-2.5Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h3>Lighting</h3>
+      <p>Makes the room look professionally lit — bright, airy, even. Changes the light only; never the room.</p>
+      <span class="st live">● Live now</span>
+    </div>
+    <div class="ecard">
+      <div class="ico ic-tidy"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 7V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h3>Tidy</h3>
+      <p>Clears clutter, makes beds, de-wrinkles cushions, raises blinds. Removes &amp; cleans only — never adds a thing.</p>
+      <span class="st soon">Building next</span>
+    </div>
+    <div class="ecard">
+      <div class="ico ic-angle"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20V8l8-4 8 4v12M4 20h16M9 20v-6h6v6M4 8l8 4 8-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h3>Angle</h3>
+      <p>Straightens walls &amp; tidies the framing — only when it truly improves the shot. Never moves the camera or invents a view.</p>
+      <span class="st live">● Live now</span>
+    </div>
+  </div>
+  <div class="note">Pick <b>any combination</b> per photo — tap the chips under each room to mix them. Each is its own independent pass. <b>Lighting and Angle are live now; Tidy is next.</b></div>
+</div></section>
+
+<section class="body"><div class="wrap">
+
+  <div class="trycard">
+    <div class="th">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 7V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <h2>Tidy — you choose what gets cleared</h2>
+      <span class="pill-new">New</span>
+    </div>
+    <p class="tsub">Drag a box over anything you want tidied — the <b>coffee table</b>, the <b>desk</b>, or the <b>couch</b>. RoomCast clears/smooths only what you select and leaves everything else exactly as it was. It can only ever <b>remove</b> clutter and soften creases — it never adds or invents anything.</p>
+    <div class="tstage" id="tstage">
+      <img id="tBase" alt="enhanced living room">
+      <span class="tbadge" id="tBadge">Drag to select what to clear</span>
+      <canvas id="tCv"></canvas>
+    </div>
+    <img id="tClean" alt="" style="display:none">
+    <div class="trow">
+      <button class="tbtn" id="tReset"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5v6h6M20 19v-6h-6M6.5 8.5A8 8 0 0 1 19 9M17.5 15.5A8 8 0 0 1 5 15" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg> Reset</button>
+      <span class="tstat" id="tStat">Drag over the coffee table to clear it.</span>
+    </div>
+    <div class="tnote"><svg viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16h.01M12 3l9 16H3l9-16Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Prototype on the living room. Select a spot with nothing to remove (the couch, the window) and it stays identical — that's the honesty guarantee.</div>
+  </div>
+
+  <div class="secttl">Your apartment</div>
+  <div id="rooms"></div>
+</div></section>
+
+<div class="ov" id="ov" role="dialog" aria-modal="true">
+  <div class="ov-card">
+    <div class="imw"><span class="ov-tag">Original · unaltered</span><img id="ovImg" alt="original phone photo"></div>
+    <div class="cap"><div><b id="ovName">Original photo</b><br><span>Your unedited phone shot — exactly what the camera captured.</span></div><button class="ov-x" id="ovX">Close</button></div>
+  </div>
+</div>
+
+<footer><div class="wrap"><span class="dot"></span> RoomCast &mdash; private preview. Every enhanced image links to its untouched original.</div></footer>
+
+<script>
+  var V='?v=28';
+  function img(p){return 'assets/loren-apt/'+p+'.webp'+V;}
+  var ROOMS=[
+    {stem:'1-living',   name:'Living room',  note:'', angle:true},
+    {stem:'2-kitchen',  name:'Kitchen',      note:'', angle:true},
+    {stem:'3-kitchen2', name:'Kitchen',      note:'dining side', angle:true},
+    {stem:'4-hall',     name:'Entryway',     note:'', angle:true},
+    {stem:'5-bath',     name:'Bathroom',     note:'', angle:true}
+  ];
+  var roomsEl=document.getElementById('rooms');
+
+  ROOMS.forEach(function(r){
+    var st={lighting:true, angle:r.angle===true};
+    var angleChip=r.angle
+      ? '<button class="chip tog on" data-k="angle"><span class="tk">✓</span> Angle</button>'
+      : '<span class="chip soon">Angle <small>refining</small></span>';
+    function srcFor(){
+      if(st.lighting&&st.angle) return img(r.stem+'-lit-angleZ');
+      if(st.lighting) return img(r.stem+'-lit');
+      if(st.angle) return img(r.stem+'-angleZ');
+      return img(r.stem+'-before');
+    }
+    var d=document.createElement('div'); d.className='room';
+    d.innerHTML=
+      '<div class="room-name">'+r.name+(r.note?' <small>'+r.note+'</small>':'')+'</div>'+
+      '<div class="ba" data-stem="'+r.stem+'">'+
+        '<img class="before" src="'+img(r.stem+'-before')+'" alt="phone photo">'+
+        '<img class="after" alt="RoomCast enhanced">'+
+        '<span class="lbl lbl-b">Phone photo</span>'+
+        '<button class="badge" data-stem="'+r.stem+'" data-name="'+r.name+'" aria-label="AI Enhanced — view original">'+
+          '<span class="pulse"></span> AI&nbsp;Enhanced'+
+          '<svg viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>'+
+        '</button>'+
+        '<div class="div"></div>'+
+        '<div class="knob"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6 4 12l5 6M15 6l5 6-5 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'+
+      '</div>'+
+      '<div class="hint"><svg viewBox="0 0 24 24" fill="none"><path d="M8 7h8M8 12h8M8 17h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Drag to compare · tap a setting to mix · tap the badge to see your original.</div>'+
+      '<div class="chips">'+
+        '<button class="chip tog on" data-k="lighting"><span class="tk">✓</span> Lighting</button>'+
+        angleChip+
+        '<span class="chip soon">Tidy <small>soon</small></span>'+
+      '</div>';
+    roomsEl.appendChild(d);
+    var afterImg=d.querySelector('.after'), badge=d.querySelector('.badge');
+    function refresh(){afterImg.src=srcFor(); badge.style.display=(st.lighting||st.angle)?'':'none';}
+    refresh();
+    d.querySelectorAll('.chip.tog').forEach(function(c){
+      c.addEventListener('click',function(){
+        st[c.dataset.k]=!st[c.dataset.k];
+        c.classList.toggle('on',st[c.dataset.k]); c.classList.toggle('off',!st[c.dataset.k]);
+        refresh();
+      });
+    });
+  });
+
+  // drag-compare per room
+  document.querySelectorAll('.ba').forEach(function(ba){
+    var after=ba.querySelector('.after'),divEl=ba.querySelector('.div'),knob=ba.querySelector('.knob');
+    var p=50;
+    function paint(){after.style.clipPath='inset(0 0 0 '+p+'%)';divEl.style.left=p+'%';knob.style.left=p+'%';}
+    function rel(x){var r=ba.getBoundingClientRect();return Math.max(0,Math.min(100,((x-r.left)/r.width)*100));}
+    function start(e){
+      var mv=function(ev){var cx=ev.touches?ev.touches[0].clientX:ev.clientX;p=rel(cx);paint();};
+      var up=function(){window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);window.removeEventListener('touchmove',mv);window.removeEventListener('touchend',up);};
+      window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);window.addEventListener('touchmove',mv,{passive:true});window.addEventListener('touchend',up);
+    }
+    knob.addEventListener('mousedown',function(e){e.preventDefault();start(e);});
+    knob.addEventListener('touchstart',function(e){start(e);},{passive:true});
+    ba.addEventListener('mousedown',function(e){if(e.target!==knob && !e.target.closest('.badge'))start(e);});
+    paint();
+  });
+
+  // AI-Enhanced badge -> original overlay
+  var ov=document.getElementById('ov'),ovImg=document.getElementById('ovImg'),ovName=document.getElementById('ovName'),ovX=document.getElementById('ovX');
+  function openOrig(stem,name){ovImg.src=img(stem+'-before');ovName.textContent=name+' — original photo';ov.classList.add('show');}
+  function closeOrig(){ov.classList.remove('show');}
+  document.querySelectorAll('.badge').forEach(function(b){
+    b.addEventListener('click',function(e){e.stopPropagation();openOrig(b.dataset.stem,b.dataset.name);});
+  });
+  ovX.addEventListener('click',closeOrig);
+  ov.addEventListener('click',function(e){if(e.target===ov)closeOrig();});
+  window.addEventListener('keydown',function(e){if(e.key==='Escape')closeOrig();});
+
+  // ---- Tidy: drag-to-select clearing (living-room prototype) ----
+  (function(){
+    var stage=document.getElementById('tstage');
+    if(!stage) return;
+    var base=document.getElementById('tBase'), clean=document.getElementById('tClean'),
+        cv=document.getElementById('tCv'), ctx=cv.getContext('2d'),
+        stat=document.getElementById('tStat'), badge=document.getElementById('tBadge'),
+        reset=document.getElementById('tReset');
+    base.src=img('1-living-lit-angleZ');
+    clean.src=img('1-living-lit-angleZ-tidy');
+    var NW=1200, NH=900;                 // natural dims of both layers (exact 4:3)
+    var boxes=[], drag=null, startPt=null;
+    var dpr=Math.max(1,window.devicePixelRatio||1);
+
+    function size(){
+      var w=stage.clientWidth, h=stage.clientHeight;
+      cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+      cv.style.width=w+'px'; cv.style.height=h+'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      render();
+    }
+    function toNat(cx,cy){
+      var r=stage.getBoundingClientRect();
+      var dx=Math.max(0,Math.min(r.width, cx-r.left)), dy=Math.max(0,Math.min(r.height, cy-r.top));
+      return {nx:dx*(NW/r.width), ny:dy*(NH/r.height)};
+    }
+    function norm(a,b){return {x0:Math.min(a.nx,b.nx),y0:Math.min(a.ny,b.ny),x1:Math.max(a.nx,b.nx),y1:Math.max(a.ny,b.ny)};}
+    function drawBox(b,active){
+      var r=stage.getBoundingClientRect(), kx=r.width/NW, ky=r.height/NH;
+      var dx=b.x0*kx, dy=b.y0*ky, dw=(b.x1-b.x0)*kx, dh=(b.y1-b.y0)*ky;
+      if(clean.complete && clean.naturalWidth){
+        ctx.drawImage(clean, b.x0,b.y0,(b.x1-b.x0),(b.y1-b.y0), dx,dy,dw,dh);  // reveal tidied pixels inside box
+      }
+      ctx.strokeStyle= active? 'rgba(35,107,100,.95)':'rgba(35,107,100,.85)';
+      ctx.lineWidth=2; ctx.setLineDash(active?[6,4]:[]);
+      ctx.strokeRect(dx+1,dy+1,dw-2,dh-2); ctx.setLineDash([]);
+    }
+    function render(){
+      var r=stage.getBoundingClientRect();
+      ctx.clearRect(0,0,r.width,r.height);
+      boxes.forEach(function(b){drawBox(b,false);});
+      if(drag) drawBox(drag,true);
+      var n=boxes.length;
+      stat.innerHTML = n
+        ? '<b>'+n+'</b> area'+(n>1?'s':'')+' tidied — everything else is untouched.'
+        : 'Drag over the coffee table, the desk, or the couch.';
+      badge.style.opacity = (n||drag)? '0':'1';
+    }
+    function down(e){var t=e.touches?e.touches[0]:e; startPt=toNat(t.clientX,t.clientY);
+      drag={x0:startPt.nx,y0:startPt.ny,x1:startPt.nx,y1:startPt.ny}; if(e.cancelable)e.preventDefault();}
+    function move(e){if(!startPt)return; var t=e.touches?e.touches[0]:e;
+      drag=norm(startPt,toNat(t.clientX,t.clientY)); render(); if(e.cancelable)e.preventDefault();}
+    function up(){if(!startPt)return;
+      if(drag && (drag.x1-drag.x0)>20 && (drag.y1-drag.y0)>20) boxes.push(drag);
+      drag=null; startPt=null; render();}
+    stage.addEventListener('mousedown',down); window.addEventListener('mousemove',move); window.addEventListener('mouseup',up);
+    stage.addEventListener('touchstart',down,{passive:false}); stage.addEventListener('touchmove',move,{passive:false}); window.addEventListener('touchend',up);
+    reset.addEventListener('click',function(){boxes=[];drag=null;render();});
+    window.addEventListener('resize',size);
+    clean.addEventListener('load',render);
+    if(base.complete) size(); else base.addEventListener('load',size);
+    size();
+  })();
+</script>
+</body>
+</html>

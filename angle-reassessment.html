@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>RoomCast — Angle Reassessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#fff;--bg2:#f8f9fa;--bg3:#f1f3f5;--ink:#1a1d21;--ink2:#6b7280;--ink3:#9ca3af;
+    --line:#e5e7eb;--accent:#2563eb;--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--purple:#6b21a8;--purple-bg:#f5f3ff;
+    --r:10px;--maxw:780px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);background:var(--bg3);line-height:1.55;-webkit-font-smoothing:antialiased;padding:34px 16px}
+  .wrap{max-width:var(--maxw);margin:0 auto}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:24px 26px;margin-bottom:16px}
+  h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+  h2{font-size:18px;font-weight:700;margin:2px 0 12px;letter-spacing:-.01em}
+  h3{font-size:14px;font-weight:700;margin:14px 0 5px}
+  p{margin-bottom:10px;color:var(--ink)}
+  .sub{color:var(--ink2);font-size:14px}
+  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  ul{margin:4px 0 8px;padding-left:0;list-style:none}
+  li{position:relative;padding-left:20px;margin-bottom:7px;color:var(--ink)}
+  li::before{content:"";position:absolute;left:4px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+  b{font-weight:600}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;margin-bottom:8px}
+  .pill.bad{background:#fef2f2;color:#b91c1c}.pill.good{background:var(--green-bg);color:var(--green)}.pill.do{background:var(--purple-bg);color:var(--purple)}
+  .verdict{background:linear-gradient(180deg,#fff,var(--bg2));border-left:3px solid var(--accent)}
+  .big{font-size:15px}
+  .mono{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--bg3);padding:1px 6px;border-radius:5px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:620px){.grid2{grid-template-columns:1fr}}
+  .mini{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:13px 15px}
+  .mini h3{margin-top:0}
+  .step{display:flex;gap:12px;margin-bottom:11px}
+  .step .n{flex:0 0 26px;height:26px;border-radius:7px;background:var(--accent);color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center}
+  .step .t{font-size:14px}
+  .foot{color:var(--ink3);font-size:12px;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="card verdict">
+    <div class="eyebrow">RoomCast · Angle — reassessment &amp; plan</div>
+    <h1>Why straightening kept failing — and the fix</h1>
+    <p class="sub big">Short version: the kitchens broke not because straightening is impossible, but because I built a crude one-knob corrector <b>and graded it on an image you never see</b>. The pros solve this a specific, known way. The single most important fix is giving me a way to actually <b>see straightness the way you do</b>.</p>
+  </div>
+
+  <div class="card">
+    <div class="pill bad">The real problem</div>
+    <h2>Three different pictures, one assumed truth</h2>
+    <p>Every round, three things disagreed — and I kept trusting the wrong two:</p>
+    <ul>
+      <li><b>My measurement</b> ran on the raw warped image and said “perfect, 0° off.”</li>
+      <li><b>My own eyeballing</b> of a small preview said “looks straight.”</li>
+      <li><b>What you actually see</b> — the final cropped + relit photo — said “clearly crooked.”</li>
+    </ul>
+    <p>All three were “true” at once because <b>they were three different images</b>. I was checking a version nobody ships. That's the whole reason I kept confidently handing you something wrong.</p>
+    <h3>And the corrector itself was built wrong</h3>
+    <ul>
+      <li><b>No camera model.</b> I used a hand-tuned “tilt amount” with no grounding in the real lens. So the same setting means different things on different photos — which is why a fix that helped one room <b>mathematically had to break another</b>. Not bad luck; structural.</li>
+      <li><b>I skipped lens correction.</b> These are wide-angle shots that bow straight lines — you must un-bow the lens <em>first</em> or the math gives a different answer every photo.</li>
+      <li><b>I aimed for full, aggressive auto-straighten</b> — the exact unstable case every pro tool deliberately avoids.</li>
+      <li><b>The shipped version hard-coded a tilt number per photo</b> — that's memorizing 5 answers, not solving it. It could never generalize to a 6th photo, let alone hundreds.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="pill good">How the pros actually do it</div>
+    <h2>It's a known, solved pipeline — copy it</h2>
+    <p>Lightroom, Capture One, and the real-estate AI tools (Autoenhance, etc.) all do the same thing under the hood, as a <b>separate geometry step before any AI enhancement</b>:</p>
+    <div class="step"><div class="n">1</div><div class="t"><b>Un-bow the lens</b> (remove wide-angle distortion) so edges are truly straight.</div></div>
+    <div class="step"><div class="n">2</div><div class="t"><b>Figure out the real camera angle</b> from the wall/door/window lines (recover the actual lens + tilt), instead of guessing a number.</div></div>
+    <div class="step"><div class="n">3</div><div class="t"><b>Apply one real geometric correction</b>, then crop the blank edges.</div></div>
+    <p style="margin-top:13px">Then three habits make it trustworthy on <b>any</b> photo — and I had none of them:</p>
+    <div class="grid2">
+      <div class="mini"><h3>Partial, not 100%</h3><p class="sub">The bigger the tilt, the <b>gentler</b> the fix. Snapping fully straight is what looks warped. This one change is “professional vs. broken.”</p></div>
+      <div class="mini"><h3>Verticals only (two-point)</h3><p class="sub">Straighten the up-down walls + level the horizon; <b>leave the rest</b>. Forcing everything straight feels unnatural and crops away the room.</p></div>
+      <div class="mini"><h3>Decline gracefully</h3><p class="sub">If a photo's too tilted or has too few clear lines, <b>return it unchanged</b>. A no-op can never look worse. Lightroom &amp; Autoenhance do this on purpose.</p></div>
+      <div class="mini"><h3>Do-no-harm guard</h3><p class="sub">If the “fixed” photo looks more crooked than the original, <b>auto-revert</b> to the original. Worst case becomes “unchanged,” never “worse.”</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="pill do">Answering your question directly</div>
+    <h2>The tools/skills to actually <em>see</em> it — and the truth about “Claude video”</h2>
+    <p>Your instinct was right: I need help here. <b>Anthropic's own docs say Claude's vision is unreliable on skewed angles and fine precision</b> — judging a 2–3° wall tilt by eye is a known weak spot. So this was never going to work by me eyeballing it. The fix isn't video — it's <b>measurement + a visible reference</b>:</p>
+    <ul>
+      <li><b>Plumb-grid overlay (the big one):</b> draw true-vertical guide lines + a horizon line over the <em>final</em> photo, side-by-side before/after. “Is it straight?” becomes a visible pass/fail against the grid — not a number I misread.</li>
+      <li><b>A verticality meter:</b> a tiny local tool that measures the walls' lean in degrees on the exact image you receive, every time.</li>
+      <li><b>A regression gate:</b> all 5 photos (plus ~20 more) must pass <em>at once</em> — so a change that fixes one and breaks another is automatically rejected. That kills the whack-a-mole.</li>
+      <li><b>Second pair of eyes:</b> two independent review agents grade the grid overlays and I reconcile them (your redundant-reviewer rule).</li>
+    </ul>
+    <p class="sub"><b>On “Claude video”:</b> it's real but it won't help here — Claude can't watch video natively (needs a Google-Gemini bridge), and for single photos there's nothing to watch. There are also vision “second-opinion” services (Groundlight) that return a yes/no with a confidence score; useful as a backstop, not the core fix. The core fix is measure-don't-eyeball + the grid overlay.</p>
+  </div>
+
+  <div class="card">
+    <div class="pill do">Product direction</div>
+    <h2>Conservative auto + your nudge + re-roll — you called it</h2>
+    <p>No single auto pass is reliable on every photo, so every pro tool ships an escape hatch. Recommended:</p>
+    <ul>
+      <li><b>Conservative auto</b> by default — aim low. An under-correction reads as “fine”; an over-correction reads as “broken.”</li>
+      <li><b>A simple strength slider</b> (0–100%) to dial any result up or down.</li>
+      <li><b>Manual mode:</b> drag two lines onto edges that should be vertical — rescues the photos auto won't touch, and users trust it because <em>they</em> chose.</li>
+      <li><b>Re-roll + thumbs up/down</b> — exactly your idea. Every thumbs-down becomes a test photo we improve against.</li>
+      <li><b>“Left as-is” is a feature,</b> not a failure: “we didn't straighten this because it would distort the room” builds trust.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="pill do">The plan</div>
+    <h2>What I'd do next — in order</h2>
+    <div class="step"><div class="n">1</div><div class="t"><b>Build the verification harness FIRST</b> (grid overlay + meter + the 5-photo gate). Free &amp; local. Nothing else ships until I can <em>see</em> straightness on the image you receive. This is the fix for the core failure.</div></div>
+    <div class="step"><div class="n">2</div><div class="t"><b>Delete the hand-tuned per-photo constants.</b> They're the source of the inconsistency.</div></div>
+    <div class="step"><div class="n">3</div><div class="t"><b>Rebuild the corrector properly:</b> un-bow lens → recover camera angle → one real correction → crop. Default to partial + verticals-only + decline, with the do-no-harm auto-revert.</div></div>
+    <div class="step"><div class="n">4</div><div class="t"><b>Add the product controls:</b> strength slider, manual 2-line mode, re-roll + feedback.</div></div>
+    <p class="sub" style="margin-top:6px">Fast-path option if you want guaranteed-reliable sooner: route correction through a proven real-estate API (Autoenhance) and build the free in-house version in parallel. My lean: build in-house (free, ownable) but <b>verification harness first either way</b> — that's the thing that was actually missing.</p>
+  </div>
+
+  <div class="card">
+    <h2>Honest risks</h2>
+    <ul>
+      <li><b>Crop tax:</b> every straighten eats some edges. Another reason to stay partial.</li>
+      <li><b>Phone lenses aren't in the standard profile databases</b> — I'll estimate the distortion; good enough but test on real phone shots, not just our 5.</li>
+      <li><b>5 photos is too few to prove “consistent.”</b> The test set must grow to ~20+ varied rooms before I can honestly claim it.</li>
+      <li>Lighting and the bathroom/entryway/living straightening you liked are <b>untouched</b> by all this — this is scoped to fixing the angle engine + how I verify it.</li>
+    </ul>
+  </div>
+
+  <p class="foot">RoomCast · private reassessment · built from a research + adversarial-critique pass (8 agents)</p>
+</div>
+</body>
+</html>

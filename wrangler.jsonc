@@ -1,0 +1,8 @@
+{
+  "name": "roomcast",
+  "pages_build_output_dir": ".",
+  "compatibility_date": "2024-05-01",
+  "kv_namespaces": [
+    { "binding": "REFINE", "id": "b6b4e28a5e824cc58eb54579af9be640" }
+  ]
+}
